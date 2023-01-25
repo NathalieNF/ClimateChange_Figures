@@ -13,7 +13,7 @@ install.packages("gganimate")
 library(gganimate)
 
 
-temp_month <- read_csv("Data/GLB.Ts+dSST.csv", skip=1, na ="***") %>% 
+temp_month <- read_csv("Data/GLB.Ts+dSST_updated.csv", skip=1, na ="***") %>% 
   select(year = Year, all_of(month.abb)) %>% 
   pivot_longer(-year, names_to = "month", values_to = "mtemp") %>%  
   drop_na() 
@@ -113,12 +113,12 @@ aspiral <- tabla %>% ggplot(aes(x = month_number, y = mtemp, group = year,
 animate(aspiral, width=3.8, height=4.3, unit="in", res=500)
 
 
-anim_save("Figures/TemperatureSpiralsAnim.gif") # for QRG
+anim_save("Figures/TemperatureSpiralsAnim_updated.gif") # for QRG
 
 # A Short video 
 install.packages("av")
 library(av)
 
 animate(aspiral, width=3.8, height=4.3, unit="in", res=500,
-        renderer = av_renderer("Figures/ClimateSpiralA.mp4")
+        renderer = av_renderer("Figures/ClimateSpiralA_updated.mp4")
 )
