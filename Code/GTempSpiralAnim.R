@@ -121,4 +121,4 @@ library(av)
 
 animate(aspiral, width=3.8, height=4.3, unit="in", res=500,
         renderer = av_renderer("Figures/ClimateSpiralA_updated.mp4")
-)
+) 

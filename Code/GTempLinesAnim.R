@@ -1,8 +1,18 @@
 #########################################################
-## Line plot of annual temperature anomalies
+## Line plot of annual temperature anomalies - Animated
+
+#to make gganimate work with this version of R
+install.packages("gifski")
+library(gifski)
+install.packages("png")
+library(png)
 
 library(tidyverse)  
 library(glue)
+
+install.packages("gganimate")
+library(gganimate)
+
 
 
 temp_month <- read_csv("Data/GLB.Ts+dSST_updated_in_april.csv", skip=1, na ="***")%>% 
@@ -29,14 +39,15 @@ annotation <- tabla %>%
   slice_max(year)  %>%
   slice_max(month_number)
 
-tabla %>% ggplot(aes(x= month_number, y = mtemp, group = year, 
-                     color= year, size = this_year)) +
+LinesA <- tabla %>% ggplot(aes(x= month_number, y = mtemp, group = year, 
+                     color= year)) +
   geom_hline(yintercept = 0, color = "white", size = 1) +
+  geom_point(size=2, 
+             # Create a distinct grouping variable for geom_point 
+             aes(group = seq_along(year)) ) +
   geom_line() +
-  geom_text(data= annotation, aes(x=month_number, y= mtemp, label= year, color= year),
-            inherit.aes = FALSE, hjust = 0, size = 5, nudge_x = 0.14, nudge_y = 0.05,
-            fontface = "bold") +
-  scale_color_viridis_c(breaks = seq(1880,2020, 20),
+  
+  scale_color_viridis_c(breaks = seq(1880,2040,20),
                         guide= guide_colorbar(frame.colour = "white",
                                               frame.linewidth = 0.7))  +
   scale_x_continuous(breaks =1:12, labels = month.abb, sec.axis = dup_axis(name = NULL, labels = NULL)) +
@@ -46,10 +57,12 @@ tabla %>% ggplot(aes(x= month_number, y = mtemp, group = year,
   coord_cartesian(xlim = c(1,12)) +
   labs(x=NULL, 
        y = "Temperature change since preindustrial time [\u00B0C]",
-       title =  glue("Global Temperature Change ({min(temp_month$year)}-{max(temp_month$year)})")) +
+       title =  glue("Global Temperature Change ({min(temp_month$year)}-{max(temp_month$year)})"), 
+       subtitle = "Data source:NASA's GISS"
+    ) +
   theme(
     panel.background = element_rect(fill = "black", color = "white", size = 1),
-    plot.background = element_rect(fill = "#444444"),
+    plot.background = element_rect(fill = "black", color = "black"),
     panel.grid = element_blank(),
     axis.text = element_text(color = "white", face = "bold", family = "Roboto"),
     axis.ticks = element_line(color = "white"),
@@ -57,12 +70,33 @@ tabla %>% ggplot(aes(x= month_number, y = mtemp, group = year,
     axis.title = element_text(color = "white", face = "bold", family = "Roboto"),
     plot.title = element_text(color= "white", face = "bold", family = "Roboto",
                               hjust = 0.5),
+    plot.subtitle = element_text(color = "white",face = "bold", family = "Roboto",
+                                 hjust = 0.5, size = 10),
     legend.title = element_blank(),
     legend.background = element_rect(fill = NA),
     legend.text = element_text(color = "white", face = 'bold'),
-    legend.key.height = unit(35.5, "pt"), 
-  )
+    legend.key.height = unit(53, "pt"),
+    
+  ) +
+  transition_manual(frames = year, cumulative = TRUE) 
+
+  
+animate(LinesA, width = 5, height = 5, unit = "in", res = 500,
+        renderer = gifski_renderer(loop = TRUE),
+        nframes = 88)
 
 
 
-ggsave("Figures/Temperature_Lines.png", width = 8, height = 4) # for QRG
+
+
+anim_save("Figures/LinesAnimated.gif") # for QRG
+
+# A Short video 
+install.packages("av")
+library(av)
+
+animate(LinesA, width= 5, height= 5, unit="in", res=500,
+        renderer = av_renderer("Figures/ClimateLinesA.mp4")
+        ) 
+
+
