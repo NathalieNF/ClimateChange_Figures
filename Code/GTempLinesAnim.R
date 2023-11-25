@@ -7,6 +7,7 @@ library(gifski)
 install.packages("png")
 library(png)
 
+install.packages("tidyverse")
 library(tidyverse)  
 library(glue)
 
@@ -15,9 +16,9 @@ library(gganimate)
 
 
 
-temp_month <- read_csv("Data/GLB.Ts+dSST_updated_in_april.csv", skip=1, na ="***")%>% 
+temp_month <- read_csv("Data/GLB.Ts+dSST_update_nov.csv", skip=1, na ="***")%>% 
   select(year = "Year",all_of(month.abb)) %>% 
-  pivot_longer(-year, names_to = "month", values_to = "mtemp") %>%  
+  pivot_longer(-year, names_to = "month", values_to = "mtemp") %>% 
   drop_na() 
 
 
